@@ -142,19 +142,31 @@ int freeList(headNode* h){
  */
 int insertFirst(headNode* h, int key) {
 
-	listNode* node = (listNode*)malloc(sizeof(listNode));
-	node->key = key;
-
-	node->link = h->first;
-	h->first = node;
-
+	listNode* node = (listNode*)malloc(sizeof(listNode)); //리스트노드 생성
+	node->key = key; //key값 추가
+	node->link = h->first; //node가 head가리키도록 함
+	h->first = node; //head에 node주소 넣음
 	return 0;
 }
 
 
 /* 리스트를 검색하여, 입력받은 key보다 큰값이 나오는 노드 바로 앞에 삽입 */
 int insertNode(headNode* h, int key) {
+/*비교연산, 링크따라 옮김 필요*/
+	if( h==NULL){ //공백리스트인경우
+		insertFirst(h,key);
+	}
+	else{
+		listNode* node = (listNode*)malloc(sizeof(listNode)); //리스트노드 생성
+		listNode* temp = (listNode*)malloc(sizeof(listNode)); //임시노드 생성
+		node->key=key;
+		temp=h->first;
+		while(temp < key){//첫 노드가 key보다 작은 경우
+			temp=temp->link; //한칸씩 뒤로
+		}
 
+		temp->link=node;
+	}
 	return 0;
 }
 
@@ -162,7 +174,21 @@ int insertNode(headNode* h, int key) {
  * list에 key에 대한 노드하나를 추가
  */
 int insertLast(headNode* h, int key) {
-
+	if(h=-NULL){
+		insertFirst(h,key);
+	}
+	else{
+		listNode* node = (listNode*)malloc(sizeof(listNode)); //리스트노드 생성
+		listNode* temp = (listNode*)malloc(sizeof(listNode)); //리스트노드 생성
+		node->key=key;
+		node->link=NULL;
+		temp=h->first;
+			while(temp->link !=NULL){
+				temp=temp->link;
+			}
+			node->link=temp->link->link;
+			temp->link=node;
+	}
 	return 0;
 }
 
