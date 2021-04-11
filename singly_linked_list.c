@@ -174,20 +174,20 @@ int insertNode(headNode* h, int key) {
  * list에 key에 대한 노드하나를 추가
  */
 int insertLast(headNode* h, int key) {
-	if(h=-NULL){
+	if(h==NULL){ //전처리검사
 		insertFirst(h,key);
 	}
 	else{
 		listNode* node = (listNode*)malloc(sizeof(listNode)); //리스트노드 생성
-		listNode* temp = (listNode*)malloc(sizeof(listNode)); //리스트노드 생성
+		listNode* temp = (listNode*)malloc(sizeof(listNode)); //임시노드 생성
 		node->key=key;
 		node->link=NULL;
 		temp=h->first;
 			while(temp->link !=NULL){
 				temp=temp->link;
 			}
-			node->link=temp->link->link;
-			temp->link=node;
+			temp=temp->link; //link가 NULL인 노드로 옮겨감
+			temp->link=node; //NULL인 링크에 node연결
 	}
 	return 0;
 }
@@ -197,8 +197,15 @@ int insertLast(headNode* h, int key) {
  * list의 첫번째 노드 삭제
  */
 int deleteFirst(headNode* h) {
+	if(h==NULL){
+		printf("Linked List is empty!!!!!");
+		return 0;
+	}
 
-
+	listNode* temp = (listNode*)malloc(sizeof(listNode)); //임시노드 생성
+	temp=h->first;
+	h->first=temp->link;
+	free(temp);
 	return 0;
 }
 
@@ -207,7 +214,23 @@ int deleteFirst(headNode* h) {
  * list에서 key에 대한 노드 삭제
  */
 int deleteNode(headNode* h, int key) {
-
+	if(h==NULL){
+			printf("Linked List is empty!!!!!");
+			return 0;
+		}
+	listNode* previous = (listNode*)malloc(sizeof(listNode)); //삭제할 노드의 선행노드
+		listNode* delete = (listNode*)malloc(sizeof(listNode)); //삭제할 노드
+		delete=h->first;
+	while(delete->link !=NULL){ //노드검색
+		if(delete->key != key){ //한칸씩 옮겨가며 비교연산
+			previous=delete;
+			delete = delete->link;
+		}
+		previous->link=delete->link;
+		free(delete);
+	}//삭제할 노드가 마지막 노드인 경우
+	free(delete);
+	previous->link=NULL;
 	return 0;
 
 }
@@ -216,6 +239,28 @@ int deleteNode(headNode* h, int key) {
  * list의 마지막 노드 삭제
  */
 int deleteLast(headNode* h) {
+	if(h==NULL){
+				printf("Linked List is empty!!!!!");
+				return 0;
+			}
+	listNode* previous = (listNode*)malloc(sizeof(listNode)); //삭제할 노드의 선행노드
+	listNode* delete = (listNode*)malloc(sizeof(listNode)); //삭제할 노드
+	delete=h->first;
+	if(delete->link==NULL){ //리스트에 노드가 하나인 경우
+		free(delete);
+		h->first = NULL;
+		return 0;
+	}
+	else{ //노드 두개 이상인 경우
+		previous = h->first; //선행노드 : 첫번째 노드로 지정
+		delete=delete->link; //선행노드 뒤의 노드
+		while(delete->link !=NULL){
+			previous = delete; //삭제할 노드 한칸씩 옮겨가며 선행노드도 함께 옮겨감
+			delete = delete ->link;
+		} //삭제할 노드의 링크가 NULL인 경우 (마지막 노드인 경우)
+		free(delete); //노드 삭제
+		previous->link=NULL; //선행노드의 링크를 NULL로 설정
+	}
 
 	return 0;
 }
