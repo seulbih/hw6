@@ -298,7 +298,7 @@ int deleteLast(headNode* h) {
 int invertList(headNode* h) {
 	listNode *p, *q, *r;
 
-	p=h;
+	p=h->first;
 	q=NULL;
 	while(p !=NULL){
 		r = q;
@@ -306,7 +306,8 @@ int invertList(headNode* h) {
 		p = p->link;
 		q->link = r;
 	}
-	return q;
+	h->first=q;
+	return h;
 }
 
 
