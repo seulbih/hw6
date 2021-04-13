@@ -56,6 +56,7 @@ int main()
 		printf("----------------------------------------------------------------\n");
 
 		printf("Command = ");
+		fflush(stdout); //이클립스 입력받을 때 printf문 출력 안되는 문제 해결용
 		scanf(" %c", &command);
 
 		switch(command) {
@@ -67,16 +68,19 @@ int main()
 			break;
 		case 'i': case 'I':
 			printf("Your Key = ");
+			fflush(stdout); //이클립스 입력받을 때 printf문 출력 안되는 문제 해결용
 			scanf("%d", &key);
 			insertNode(headnode, key);
 			break;
 		case 'd': case 'D':
 			printf("Your Key = ");
+			fflush(stdout); //이클립스 입력받을 때 printf문 출력 안되는 문제 해결용
 			scanf("%d", &key);
 			deleteNode(headnode, key);
 			break;
 		case 'n': case 'N':
 			printf("Your Key = ");
+			fflush(stdout); //이클립스 입력받을 때 printf문 출력 안되는 문제 해결용
 			scanf("%d", &key);
 			insertLast(headnode, key);
 			break;
@@ -85,6 +89,7 @@ int main()
 			break;
 		case 'f': case 'F':
 			printf("Your Key = ");
+			fflush(stdout); //이클립스 입력받을 때 printf문 출력 안되는 문제 해결용
 			scanf("%d", &key);
 			insertFirst(headnode, key);
 			break;
@@ -144,6 +149,7 @@ int insertFirst(headNode* h, int key) {
 
 	listNode* node = (listNode*)malloc(sizeof(listNode)); //리스트노드 생성
 	node->key = key; //key값 추가
+
 	node->link = h->first; //node가 head가리키도록 함
 	h->first = node; //head에 node주소 넣음
 	return 0;
@@ -153,19 +159,32 @@ int insertFirst(headNode* h, int key) {
 /* 리스트를 검색하여, 입력받은 key보다 큰값이 나오는 노드 바로 앞에 삽입 */
 int insertNode(headNode* h, int key) {
 /*비교연산, 링크따라 옮김 필요*/
-	if( h==NULL){ //공백리스트인경우
+	if( h->first==NULL){ //공백리스트인경우
 		insertFirst(h,key);
 	}
-	else{
-		listNode* node = (listNode*)malloc(sizeof(listNode)); //리스트노드 생성
-		listNode* temp = (listNode*)malloc(sizeof(listNode)); //임시노드 생성
-		node->key=key;
-		temp=h->first;
-		while(temp < key){//첫 노드가 key보다 작은 경우
-			temp=temp->link; //한칸씩 뒤로
+	listNode* node = (listNode*)malloc(sizeof(listNode)); //리스트노드 생성
+	listNode* temp = (listNode*)malloc(sizeof(listNode)); //임시노드 생성
+	node->key=key;
+	temp=h->first;
+	if(temp->key>=key){ //비교연산
+		node->link=temp;
+		h->first=node;
 		}
-
-		temp->link=node;
+	else{
+		while(1){
+			if (temp->link ==NULL){ //노드가 한개인 경우
+				temp->link=node;
+				node->link=NULL;
+				break;
+			}
+			else if (temp->link->key>key){//temp->key <= key < temp->link->key
+				node->link=temp->link;
+				temp->link=node;
+				break;
+			}
+			else //범위에 해당하지 않으면 temp 한칸 옮김
+				temp=temp->link;
+		}
 	}
 	return 0;
 }
@@ -181,12 +200,11 @@ int insertLast(headNode* h, int key) {
 		listNode* node = (listNode*)malloc(sizeof(listNode)); //리스트노드 생성
 		listNode* temp = (listNode*)malloc(sizeof(listNode)); //임시노드 생성
 		node->key=key;
-		node->link=NULL;
+		node->link=NULL; //node는 마지막 값이므로 link에 NULL을 넣어준다.
 		temp=h->first;
-			while(temp->link !=NULL){
+			while(temp->link !=NULL){ //temp가 마지막에 위치하도록
 				temp=temp->link;
 			}
-			temp=temp->link; //link가 NULL인 노드로 옮겨감
 			temp->link=node; //NULL인 링크에 node연결
 	}
 	return 0;
@@ -214,23 +232,30 @@ int deleteFirst(headNode* h) {
  * list에서 key에 대한 노드 삭제
  */
 int deleteNode(headNode* h, int key) {
-	if(h==NULL){
+	if(h->first==NULL){
 			printf("Linked List is empty!!!!!");
 			return 0;
 		}
+	else{
 	listNode* previous = (listNode*)malloc(sizeof(listNode)); //삭제할 노드의 선행노드
-		listNode* delete = (listNode*)malloc(sizeof(listNode)); //삭제할 노드
-		delete=h->first;
-	while(delete->link !=NULL){ //노드검색
-		if(delete->key != key){ //한칸씩 옮겨가며 비교연산
-			previous=delete;
-			delete = delete->link;
+	listNode* delete = (listNode*)malloc(sizeof(listNode)); //삭제할 노드
+	previous=h->first; //previous->delete 순
+	if(previous->key == key){ //첫번 째 노드가 key일 때
+		deleteFirst(h);
+	}
+	while(previous->link !=NULL){ //노드검색
+		if(previous->link->key == key){
+			delete=previous->link;
+			previous->link=previous->link->link;
+			free(delete);
 		}
-		previous->link=delete->link;
-		free(delete);
-	}//삭제할 노드가 마지막 노드인 경우
-	free(delete);
-	previous->link=NULL;
+		previous=previous->link; //한칸씩 옮김
+	}
+		if(previous->link==NULL){//key값이 노드에 없는 경우
+			printf("Key is not founded in linked list\n");
+		}
+	}
+
 	return 0;
 
 }
@@ -269,9 +294,19 @@ int deleteLast(headNode* h) {
 /**
  * 리스트의 링크를 역순으로 재 배치
  */
-int invertList(headNode* h) {
 
-	return 0;
+int invertList(headNode* h) {
+	listNode *p, *q, *r;
+
+	p=h;
+	q=NULL;
+	while(p !=NULL){
+		r = q;
+		q = p;
+		p = p->link;
+		q->link = r;
+	}
+	return q;
 }
 
 
